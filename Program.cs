@@ -1,5 +1,8 @@
 var builder = WebApplication.CreateBuilder(args);
 
+// Lee el archivo secrets.json si existe
+builder.Configuration.AddJsonFile("secrets.json", optional: true, reloadOnChange: true);
+
 // 1. AGREGADO: Le decimos al motor que vamos a usar la arquitectura de Controladores
 builder.Services.AddControllers();
 
