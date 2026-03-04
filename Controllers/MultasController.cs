@@ -15,7 +15,6 @@ namespace ValidadorAPI.Controllers
             _configuration = configuration;
         }
 
-        // Ruta para consultar por DNI: GET /api/multas/conductor/12345678
         [HttpGet("conductor/{dni}")]
         public IActionResult ConsultarConductor(int dni)
         {
@@ -28,7 +27,8 @@ namespace ValidadorAPI.Controllers
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                string query = "SELECT DNI, Genero, Nombre, Apellido, Estado_LibreDeuda, Fecha_Ultima_Consulta FROM Conductor WHERE DNI = @dni";
+                // Actualizamos la consulta con los campos exactos de tu tabla
+                string query = "SELECT DNI, Nombre, Apellido, Genero, Domicilio, TieneMulta, Fecha_Ultima_Consulta, Estado FROM Conductor WHERE DNI = @dni";
                 SqlCommand command = new SqlCommand(query, connection);
                 command.Parameters.AddWithValue("@dni", dni);
 
@@ -42,12 +42,13 @@ namespace ValidadorAPI.Controllers
                             var conductor = new Conductores
                             {
                                 DNI = (int)reader["DNI"],
-                                Genero = reader["Genero"].ToString()!,
                                 Nombre = reader["Nombre"] != DBNull.Value ? reader["Nombre"].ToString() : null,
                                 Apellido = reader["Apellido"] != DBNull.Value ? reader["Apellido"].ToString() : null,
-                                // Si Estado_LibreDeuda es 1 (True), Tiene_Multas es False
-                                Tiene_Multas = reader["Estado_LibreDeuda"] != DBNull.Value ? !(bool)reader["Estado_LibreDeuda"] : null,
-                                Fecha_Ultima_Consulta = reader["Fecha_Ultima_Consulta"] != DBNull.Value ? (DateTime)reader["Fecha_Ultima_Consulta"] : null
+                                Genero = reader["Genero"].ToString()!,
+                                Domicilio = reader["Domicilio"] != DBNull.Value ? reader["Domicilio"].ToString() : null,
+                                TieneMulta = reader["TieneMulta"] != DBNull.Value ? (bool)reader["TieneMulta"] : null,
+                                Fecha_Ultima_Consulta = reader["Fecha_Ultima_Consulta"] != DBNull.Value ? (DateTime)reader["Fecha_Ultima_Consulta"] : null,
+                                Estado = reader["Estado"] != DBNull.Value ? (bool)reader["Estado"] : null
                             };
                             return Ok(conductor);
                         }
@@ -55,14 +56,12 @@ namespace ValidadorAPI.Controllers
                 }
                 catch (Exception ex)
                 {
-                    // Esto atrapará errores como "No se pudo conectar al servidor"
                     return StatusCode(500, $"Error conectando a la base de datos: {ex.Message}");
                 }
             }
             return NotFound("Conductor no encontrado en la base de datos.");
         }
 
-        // Ruta para consultar por Dominio: GET /api/multas/vehiculo/AB123CD
         [HttpGet("vehiculo/{dominio}")]
         public IActionResult ConsultarVehiculo(string dominio)
         {
@@ -75,7 +74,8 @@ namespace ValidadorAPI.Controllers
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                string query = "SELECT Dominio, Marca, Estado_LibreDeuda, Fecha_Ultima_Consulta FROM Vehiculo WHERE Dominio = @dominio";
+                // Actualizamos la consulta para Vehiculo
+                string query = "SELECT Dominio, Marca, Modelo, TieneMulta, Fecha_Ultima_Consulta, Estado FROM Vehiculo WHERE Dominio = @dominio";
                 SqlCommand command = new SqlCommand(query, connection);
                 command.Parameters.AddWithValue("@dominio", dominio);
 
@@ -90,8 +90,10 @@ namespace ValidadorAPI.Controllers
                             {
                                 Dominio = reader["Dominio"].ToString()!,
                                 Marca = reader["Marca"] != DBNull.Value ? reader["Marca"].ToString() : null,
-                                Tiene_Multas = reader["Estado_LibreDeuda"] != DBNull.Value ? !(bool)reader["Estado_LibreDeuda"] : null,
-                                Fecha_Ultima_Consulta = reader["Fecha_Ultima_Consulta"] != DBNull.Value ? (DateTime)reader["Fecha_Ultima_Consulta"] : null
+                                Modelo = reader["Modelo"] != DBNull.Value ? reader["Modelo"].ToString() : null,
+                                TieneMulta = reader["TieneMulta"] != DBNull.Value ? (bool)reader["TieneMulta"] : null,
+                                Fecha_Ultima_Consulta = reader["Fecha_Ultima_Consulta"] != DBNull.Value ? (DateTime)reader["Fecha_Ultima_Consulta"] : null,
+                                Estado = reader["Estado"] != DBNull.Value ? (bool)reader["Estado"] : null
                             };
                             return Ok(vehiculo);
                         }
