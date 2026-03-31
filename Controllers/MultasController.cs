@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient; 
 using ValidadorAPI.Models;
+using ValidadorAPI.Security;
 
 namespace ValidadorAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [ApiKey]
     public class MultasController : ControllerBase
     {
         private readonly IConfiguration _configuration;
